@@ -1,0 +1,6 @@
+---
+keepalived_interface: eth1
+keepalived_virtual_router_id: 1
+keepalived_virtual_ipaddress: 10.0.70.10
+keepalived_priority: 1
+keepalived_password: P@$$w0rd

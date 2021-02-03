@@ -1,0 +1,19 @@
+---
+php_fpm_user: nobody
+php_fpm_group: nobody
+
+php_fpm_modules: []
+
+php_fpm_pool_name: www
+php_fpm_pool_user: nobody
+php_fpm_pool_group: nobody
+php_fpm_pool_pm: dynamic
+php_fpm_pool_pm_max_children: 5
+php_fpm_pool_pm_start_servers: 2
+php_fpm_pool_pm_min_spare_servers: 1
+php_fpm_pool_pm_max_spare_server: 3
+php_fpm_pool_pm_max_requests: 200
+php_fpm_pool_pm_status_path: /status
+php_fpm_pool_clear_env: true
+php_fpm_pool_tcp_enabled: false
+php_fpm_listen_port: 9000

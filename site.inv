@@ -1,0 +1,14 @@
+[all]
+patroni_postgresql2 ansible_host=Error # 0
+patroni_consul2 ansible_host=Error # 1
+entrypoint ansible_host=Error # 2
+patroni_haproxy1 ansible_host=Error # 3
+patroni_postgresql1 ansible_host=Error # 4
+patroni_haproxy2 ansible_host=Error # 5
+patroni_consul1 ansible_host=Error # 6
+patroni_postgresql3 ansible_host=Error # 7
+patroni_consul3 ansible_host=Error # 8
+centos-4gb-ams1-1 ansible_host=Error # 9
+
+[entrypoint]
+entrypoint ansible_host=185.177.93.144 # external IP address for web-application user

@@ -1,0 +1,16 @@
+{
+    "server": {{ consul_server_mode | bool | to_json }},
+    "node_name": "{{ consul_node_name }}",
+    "datacenter": "{{ consul_datacenter }}",
+    "data_dir": "{{ consul_datadir }}",
+    "bind_addr": "{{ consul_bind_addr }}",
+    "client_addr": "{{ consul_client_addr }}",
+    "advertise_addr": "{{ consul_advertise_addr }}",
+    {% if consul_server_mode == true %}
+    "bootstrap_expect": {{ consul_bootstrap_expect }},
+    {% endif %}
+    "retry_join": {{ consul_retry_join_list | map('ipwrap') | list | to_json }},
+    "ui": {{ consul_ui | bool | to_json }},
+    "log_level": "{{ consul_log_level }}",
+    "enable_syslog": {{ consul_enable_syslog | bool | to_json }}
+}

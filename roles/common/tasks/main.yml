@@ -1,0 +1,24 @@
+---
+- name: Install packages
+  yum:
+    name:
+      - epel-release
+      - libselinux-python
+      - policycoreutils-python
+      - firewalld
+      - curl
+    state: present
+
+- name: Disable firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+
+- name: SELinux disable
+  selinux:
+    state: disabled
+
+- name: Change timezone
+  timezone:
+    name: Europe/Moscow

@@ -1,0 +1,5 @@
+---
+haproxy_bind_port: 80
+haproxy_statistics_bind_port: 8080
+haproxy_statistics_username: haproxy
+haproxy_statistics_password: P@$$w0rd

@@ -1,0 +1,7 @@
+---
+nat_router_wan_interface: eth0
+nat_router_lan_interface: eth1
+
+nat_router_lan_ip_range: 192.168.0.0/24
+
+nat_router_port_forwards: []

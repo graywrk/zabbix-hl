@@ -1,0 +1,56 @@
+[servers]
+patroni_postgresql1 ansible_host=10.0.70.10 ansible_user=adminroot
+patroni_postgresql2 ansible_host=10.0.70.11 ansible_user=adminroot
+patroni_postgresql3 ansible_host=10.0.70.12 ansible_user=adminroot
+patroni_consul1 ansible_host=10.0.70.20 ansible_user=adminroot
+patroni_consul2 ansible_host=10.0.70.21 ansible_user=adminroot
+patroni_consul3 ansible_host=10.0.70.22 ansible_user=adminroot
+patroni_haproxy1 ansible_host=10.0.70.30 ansible_user=adminroot
+patroni_haproxy2 ansible_host=10.0.70.31 ansible_user=adminroot
+zabbix_server1 ansible_host=10.0.70.40 ansible_user=adminroot
+zabbix_server2 ansible_host=10.0.70.41 ansible_user=adminroot
+zabbix_server3 ansible_host=10.0.70.42 ansible_user=adminroot
+zabbix_web1 ansible_host=10.0.70.50 ansible_user=adminroot
+zabbix_web2 ansible_host=10.0.70.51 ansible_user=adminroot
+zabbix_web3 ansible_host=10.0.70.52 ansible_user=adminroot
+zabbix_haproxy1 ansible_host=10.0.70.60 ansible_user=adminroot
+zabbix_haproxy2 ansible_host=10.0.70.61 ansible_user=adminroot
+
+[gateways]
+gw ansible_host=185.177.93.144 ansible_user=adminroot # external IP address
+
+[patroni_haproxy]
+patroni_haproxy1
+patroni_haproxy2
+
+[patroni_consul]
+patroni_consul1
+patroni_consul2
+patroni_consul3
+
+[patroni_postgresql]
+patroni_postgresql1
+patroni_postgresql2
+patroni_postgresql3
+
+[zabbix_haproxy]
+zabbix_haproxy1
+zabbix_haproxy2
+
+[zabbix_server]
+zabbix_server1
+zabbix_server2
+zabbix_server3
+
+[zabbix_web]
+zabbix_web1
+zabbix_web2
+zabbix_web3
+
+[glusterfs]
+zabbix_web1
+zabbix_web2
+zabbix_web3
+
+[zabbix_agent:children]
+servers

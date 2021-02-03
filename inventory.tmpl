@@ -1,0 +1,7 @@
+[all]
+%{ for index, hostname in all-hostname ~}
+${hostname} ansible_host=${try(all-private-ip[index], "Error")} # ${index}
+%{ endfor ~}
+
+[entrypoint]
+${entrypoint-name} ansible_host=${entrypoint-ip} # external IP address for web-application user

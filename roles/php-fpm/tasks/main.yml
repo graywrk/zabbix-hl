@@ -1,0 +1,56 @@
+---
+- name: Install epel-release
+  yum:
+   name: epel-release
+   state: present
+
+- name: Import remi GPG key
+  rpm_key:
+    key: "https://rpms.remirepo.net/RPM-GPG-KEY-remi2018"
+    state: present
+
+- name: Install remi repo
+  yum:
+    name: "https://rpms.remirepo.net/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm"
+    state: present
+
+- name: Install php-fpm and dependencies
+  yum:
+   name: 
+     - php-fpm
+     - php-common
+     
+   state: present
+
+- name: Make override dir for service php-fpm
+  file:
+   path: /etc/systemd/system/php-fpm.service.d
+   state: directory
+
+- name: Enable start after reboot for php-fpm
+  copy:
+   src: override.conf
+   dest: /etc/systemd/system/php-fpm.service.d/override.conf
+
+- name: Make upload_tmp_dir
+  file:
+   path: /var/lib/php/upload
+   state: directory
+
+- name: Change ownership of php installation
+  file: 
+    path: /var/lib/php/ 
+    owner: "{{ php_fpm_user }}"
+    group: "{{ php_fpm_group }}"
+    state: directory
+    recurse: yes
+
+- name: Disable default pool
+  command: mv /etc/php-fpm.d/www.conf /etc/php-fpm.d/www.disabled creates=/etc/php-fpm.d/www.disabled
+  notify: restart php-fpm
+
+- name: php-fpm service state
+  service: 
+    name: php-fpm
+    state: started
+    enabled: yes

@@ -1,0 +1,60 @@
+---
+- name: Install required packages
+  yum:
+    name: unzip
+    state: present
+
+- name: Download Consul archive
+  get_url:
+    url: https://releases.hashicorp.com/consul/1.9.0/consul_1.9.0_linux_amd64.zip
+    dest: /tmp/consul.zip
+
+- name: Unarchive Consul
+  unarchive:
+    src: /tmp/consul.zip
+    dest: "{{ consul_bin_dir }}"
+    remote_src: True
+
+- name: Remove temporary file
+  file:
+    path: /tmp/consul.zip
+    state: absent
+
+- name: Create consul user
+  user:
+    name: consul
+    shell: /bin/false
+    home: "{{ consul_bin_dir }}"
+
+- name: Prepare consul directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: consul
+    group: consul
+  with_items:
+      - "{{ consul_conf_dir }}"
+      - "{{ consul_bin_dir }}"
+      - "{{ consul_run_dir }}"
+      - "{{ consul_datadir }}"
+  tags:
+    - dirs
+
+- name: Configure systemd service file for Consul
+  template:
+    src: consul.service.j2
+    dest: /etc/systemd/system/consul.service
+
+- name: Start and enable on boot consul
+  service:
+    name: consul
+    enabled: yes
+    state: started
+
+- name: Configure Consul
+  template:
+    src: consul.json.j2
+    dest: "{{ consul_conf_file }}"
+    owner: consul
+    group: consul
+  notify: restart consul

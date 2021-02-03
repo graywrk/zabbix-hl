@@ -1,0 +1,84 @@
+---
+- name: Install dependencies for glusterfs
+  yum:
+    name: "centos-release-gluster"
+    state: present
+
+- name: Install packages for glusterfs
+  yum:
+    name: 
+      - glusterfs-server
+      - glusterfs-client
+    state: present
+
+- name: Make override dir for service glusterd
+  file:
+    path: /etc/systemd/system/glusterd.service.d
+    state: directory
+
+- name: Enable automatic start glusterd after restart
+  copy:
+    src: override.conf
+    dest: /etc/systemd/system/glusterd.service.d/override.conf
+
+- name: Enable gluster service
+  systemd:
+    name: glusterd
+    state: started
+    enabled: yes
+
+- name: Check if firewalld is running
+  command: systemctl status firewalld
+  ignore_errors: yes
+  changed_when: false
+  register: firewalld_status
+
+- name: Add gluster zone to firewalld
+  firewalld:
+    zone: gluster
+    state: present
+    permanent: true
+  when: firewalld_status is succeeded
+
+- name: Reload firewalld
+  service:
+    name: firewalld
+    state: restarted
+  when: firewalld_status is succeeded
+
+- name: Firewalld add trusted ip to gluster zone
+  firewalld:
+    source: "{{ item }}"
+    zone: gluster
+    state: enabled
+    permanent: true
+    immediate: true
+  with_items: "{{ gluster_trusted_ips }}"
+  when: firewalld_status is succeeded
+
+- name: Firewalld open ports for glusterfs service
+  firewalld:
+    service: glusterfs
+    zone: gluster
+    permanent: true
+    immediate: true
+    state: enabled
+  when: firewalld_status is succeeded
+
+- name: Firewalld open ports for rpc-bind service
+  firewalld:
+    service: rpc-bind
+    zone: gluster
+    permanent: true
+    immediate: true
+    state: enabled
+  when: firewalld_status is succeeded
+
+- name: Firewalld open port 24010/tcp
+  firewalld:
+    port: 24010/tcp
+    zone: gluster
+    permanent: true
+    immediate: true
+    state: enabled
+  when: firewalld_status is succeeded

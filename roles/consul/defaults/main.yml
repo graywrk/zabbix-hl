@@ -1,0 +1,19 @@
+---
+consul_server_mode: false
+consul_node_name: consul1
+consul_datacenter: dc1
+consul_datadir: /var/consul/data
+consul_bind_addr: 0.0.0.0
+consul_client_addr: 0.0.0.0
+consul_advertise_addr: 127.0.0.1
+consul_bootstrap_expect: 1
+consul_retry_join_list: []
+consul_ui: true
+consul_log_level: DEBUG
+consul_enable_syslog: true
+
+consul_pid_file: /var/run/consul/consul.pid
+consul_run_dir: /var/run/consul
+consul_bin_dir: /usr/local/bin
+consul_conf_dir: /etc/consul
+consul_conf_file: /etc/consul/consul.json

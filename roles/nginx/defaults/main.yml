@@ -1,0 +1,3 @@
+---
+nginx_bind_port_http: 80
+nginx_bind_port_https: 443

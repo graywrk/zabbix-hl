@@ -1,0 +1,47 @@
+---
+- name: Install keepalived
+  yum:
+    name: keepalived
+    state: present
+
+- name: Deploy keepalived config
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+  notify: restart keepalived
+
+- name: Updating net.ipv4.ip_nonlocal_bind sysctl
+  sysctl:
+    name: net.ipv4.ip_nonlocal_bind
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Updating net.ipv4.ip_forward sysctl
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Check if firewalld is running
+  command: systemctl status firewalld
+  ignore_errors: yes
+  changed_when: false
+  register: firewalld_status
+
+- name: Configure firewalld for haproxy
+  firewalld:
+    zone: public
+    rich_rule: rule protocol value="vrrp" accept
+    permanent: true
+    state: enabled
+  when: firewalld_status is succeeded
+
+- name: Enable keepalive to be started after reboot
+  service:
+    name: keepalived
+    enabled: yes
+    state: started

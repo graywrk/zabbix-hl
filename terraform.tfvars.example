@@ -1,0 +1,16 @@
+ah_access_token = "access token from AH"
+ah_private_network_ip_range = "10.0.70.0/24"
+ah_private_network_ip_start_with = "10.0.70."
+ah_base_image = "centos-7-x64"
+ah_default_dc = "ams1"
+ah_default_product = "start-xs"
+ah_default_use_password = false
+ah_ssh_keys = ["fingerprint for SSH key from AH"]
+ah_default_create_public_ip_address = false
+
+patroni_consul_instances = 3
+patroni_postgresql_instances = 3
+patroni_haproxy_instances = 2
+zabbix_server_instances = 3
+zabbix_web_instances = 3
+zabbix_haproxy_instances = 2

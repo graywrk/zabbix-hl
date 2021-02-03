@@ -1,0 +1,36 @@
+---
+- name: Disable firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+
+- name: Install tools
+  yum:
+    state: present
+    name:
+      - iptables
+      - iptables-services
+
+- name: Enable iptables
+  service:
+    name: iptables
+    enabled: yes
+    state: started 
+
+- name: Enable forwarding after reboot
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_set: yes
+
+- name: Set iptables rules
+  template:
+    src: iptables.sh.j2
+    dest: /etc/iptables.sh
+    mode: 0740
+
+- name: Apply iptables rules
+  command: /etc/iptables.sh
+  notify: restart iptables
