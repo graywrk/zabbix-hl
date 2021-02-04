@@ -1,0 +1,5 @@
+---
+haproxy_patroni_bind_port: 80
+haproxy_patroni_statistics_bind_port: 8080
+haproxy_patroni_statistics_username: haproxy
+haproxy_patroni_statistics_password: P@$$w0rd

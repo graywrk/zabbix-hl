@@ -46,18 +46,18 @@
   tags:
     - always
 
-- name: "Install local python-netaddr package"
-  pip:
-    name: netaddr
-    state: present
-  register: zabbix_python_netaddr_package_installed
-  until: zabbix_python_netaddr_package_installed is succeeded
-  delegate_to: localhost
-  run_once: True
-  become: "{{ zabbix_agent_become_on_localhost }}"
-  when:
-    - zabbix_install_pip_packages | bool
-    - ansible_all_ipv4_addresses is defined or (zabbix_agent_ip is not defined and total_private_ip_addresses is defined)
+#- name: "Install local python-netaddr package"
+#  pip:
+#    name: netaddr
+#    state: present
+#  register: zabbix_python_netaddr_package_installed
+#  until: zabbix_python_netaddr_package_installed is succeeded
+#  delegate_to: localhost
+#  run_once: True
+#  become: "{{ zabbix_agent_become_on_localhost }}"
+#  when:
+#    - zabbix_install_pip_packages | bool
+#    - ansible_all_ipv4_addresses is defined or (zabbix_agent_ip is not defined and total_private_ip_addresses is defined)
 
 - name: "Encrypt with TLS PSK auto management"
   include_tasks: tlspsk_auto.yml

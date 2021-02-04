@@ -17,7 +17,7 @@ zabbix_haproxy1 ansible_host=10.0.70.60 ansible_user=adminroot
 zabbix_haproxy2 ansible_host=10.0.70.61 ansible_user=adminroot
 
 [gateways]
-gw ansible_host=185.177.93.144 ansible_user=adminroot # external IP address
+gw ansible_host=185.177.92.12 ansible_user=adminroot # external IP address
 
 [patroni_haproxy]
 patroni_haproxy1

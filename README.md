@@ -1,12 +1,16 @@
-env ANSIBLE_CONFIG="./ansible.cfg" ansible all -m ping
+# Zabbix-HA
+
+### Схема проекта
+
+![] zabbix-hl.png
+
+### Запуск
+terraform init
+terraform apply
+
+изменить IP в hosts и ansible.cfg
+
 env ANSIBLE_CONFIG="./ansible.cfg" ansible-playbook site.yml
 
+### Доступ по SSH
 ssh -C -F ./ssh.cfg adminroot@host
-
-Адресация:
-10.0.70.0/24
-
-patroni: 
-postresql 10.0.70.1x
-consul 10.0.70.2x
-haproxy 10.0.70.3x

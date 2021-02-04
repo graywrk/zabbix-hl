@@ -1,0 +1,62 @@
+#---------------------------------------------------------------------
+# Global settings
+#---------------------------------------------------------------------
+global
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     800
+    user        haproxy             #Haproxy running under user and group "haproxy"
+    group       haproxy
+    daemon
+
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats
+
+#---------------------------------------------------------------------
+# common defaults that all the 'listen' and 'backend' sections will
+# use if not designated in their block
+#---------------------------------------------------------------------
+defaults
+    log global
+    mode tcp
+    retries 2
+    timeout client 30m
+    timeout connect 4s
+    timeout server 30m
+    timeout check 5s
+
+#---------------------------------------------------------------------
+#HAProxy Monitoring Config
+#---------------------------------------------------------------------
+listen haproxy-stat *:{{ haproxy_patroni_statistics_bind_port }}                #Haproxy Monitoring run on port 8080
+    mode http
+    option forwardfor
+    option httpclose
+    stats enable
+    stats show-legends
+    stats refresh 5s
+    stats uri /stats                             #URL for HAProxy monitoring
+    stats realm Haproxy\ Statistics
+    stats auth {{ haproxy_patroni_statistics_username }}:{{ haproxy_patroni_statistics_password }}            #User and Password for login to the monitoring dashboard
+    stats admin if TRUE
+
+#---------------------------------------------------------------------
+# FrontEnd Configuration
+#---------------------------------------------------------------------
+frontend main
+    bind *:{{ haproxy_patroni_bind_port }}
+    default_backend postgres-patroni
+
+#---------------------------------------------------------------------
+# BackEnd
+#---------------------------------------------------------------------
+
+backend postgres-patroni
+    mode tcp
+    option httpchk
+    http-check expect status 200
+    default-server inter 3s fall 3 rise 2
+
+{% for host in haproxy_patroni_backends %}
+    server {{ host.name }} {{ host.ip }}:{{ host.port }} maxconn 300 check port {{ host.checkport }}
+{% endfor %}

@@ -8,7 +8,7 @@
     nat_router_wan_interface: eth0
     nat_router_lan_interface: eth1
     nat_router_lan_ip_range: 10.0.70.0/24
-    port_forwards:
+    nat_router_port_forwards:
       - port: 80
         protocol: tcp
         destination: 10.0.70.69
@@ -49,18 +49,22 @@
   tags: [patroni, patroni-haproxy]
   become: yes
   roles:
-    - haproxy
+    - haproxy_patroni
   vars:
-    haproxy_backends:
+    haproxy_patroni_bind_port: 5432
+    haproxy_patroni_backends:
       - name: postgres1
         ip: 10.0.70.10
-        port: 5000
+        port: 5432
+        checkport: 8008
       - name: postgres2
         ip: 10.0.70.11
-        port: 5000
+        port: 5432
+        checkport: 8008
       - name: postgres3
         ip: 10.0.70.12
-        port: 5000
+        port: 5432
+        checkport: 8008
 
 - hosts: patroni_haproxy1
   tags: [patroni, patroni-haproxy, patroni-keepalived]
@@ -134,6 +138,7 @@
     consul_server_mode: false
     consul_node_name: "{{ inventory_hostname }}"
     consul_datacenter: dc1
+    consul_advertise_addr: "{{ ansible_ssh_host }}"
     consul_retry_join_list: ['10.0.70.20', '10.0.70.21', '10.0.70.22']
     
 - hosts: patroni_postgresql
@@ -142,6 +147,7 @@
   roles:
     - patroni
   vars:
+    patroni_scope: main
     patroni_replication_username: replicator
     patroni_replication_password: repuserpasswd
     patroni_superuser_username: postgres
@@ -150,10 +156,22 @@
     patroni_dcs_exists: true
     patroni_consul_host: "127.0.0.1:8500"
     patroni_consul_port: 8500
-    patroni_consul_url: ""
     patroni_consul_scheme: http
     patroni_consul_dc: "dc1"
     patroni_consul_service_check_interval: 5s
+    patroni_bootstrap_dcs_postgresql_pg_hba:
+      - { type: "local", database: "all", user: "postgres", method: "ident" }
+      - { type: "host", database: "all", user: "replicator", address: "10.0.70.0/24", method: "md5" }
+      - { type: "host", database: "all", user: "all", address: "0.0.0.0/0", method: "md5" }
+    patroni_bootstrap_pg_hba:
+      - { type: "local", database: "all", user: "postgres", method: "ident" }
+      - { type: "host", database: "all", user: "replicator", address: "10.0.70.0/24", method: "md5" }
+      - { type: "host", database: "all", user: "all", address: "0.0.0.0/0", method: "md5" }
+    patroni_postgresql_pg_hba:
+      - { type: "local", database: "all", user: "postgres", method: "ident" }
+      - { type: "host", database: "all", user: "replicator", address: "10.0.70.0/24", method: "md5" }
+      - { type: "host", database: "all", user: "all", address: "0.0.0.0/0", method: "md5" }
+      
 
 - hosts: zabbix_haproxy
   tags: [zabbix, zabbix-haproxy]
@@ -171,7 +189,7 @@
         port: 80
       - name: zabbix_web3
         ip: 10.0.70.52
-        port: 5000
+        port: 80
 
 - hosts: zabbix_haproxy1
   tags: [zabbix, zabbix-haproxy, zabbix-keepalived]
@@ -197,6 +215,88 @@
     keepalived_priority: 100
     keepalived_password: P@$$w0rd
 
+- hosts: zabbix_server1
+  tags: [zabbix, zabbix-server]
+  become: yes
+  roles:
+    - zabbix_server
+    - keepalived
+  vars:
+    keepalived_interface: eth1
+    keepalived_virtual_router_id: 1
+    keepalived_virtual_ipaddress: 10.0.70.49
+    keepalived_priority: 100
+    keepalived_password: P@$$w0rd    
+    zabbix_server_version: 5.0
+    zabbix_server_listenport: 10051
+    zabbix_server_manage_service: false
+    zabbix_server_dbhost_run_install: true
+    zabbix_server_database: pgsql
+    zabbix_server_database_long: postgresql
+    zabbix_server_dbhost: 10.0.70.19
+    zabbix_server_db_port: 5432
+    zabbix_server_real_dbhost: 10.0.70.11
+    zabbix_server_dbname: zabbix
+    zabbix_server_dbuser: zabbix
+    zabbix_server_dbpassword: supersecret
+    zabbix_server_database_creation: true
+    zabbix_server_database_sqlload: true
+    zabbix_server_privileged_host: '%'
+    zabbix_server_pgsql_login_host: 10.0.70.19
+    zabbix_server_pgsql_login_port: 5432
+    zabbix_server_pgsql_login_user: postgres
+    zabbix_server_pgsql_login_password: supersecretpostgrespasswd
+
+- hosts: zabbix_server2
+  tags: [zabbix, zabbix-server]
+  become: yes
+  roles:
+    - zabbix_server
+    - keepalived
+  vars:
+    keepalived_interface: eth1
+    keepalived_virtual_router_id: 1
+    keepalived_virtual_ipaddress: 10.0.70.49
+    keepalived_priority: 101
+    keepalived_password: P@$$w0rd    
+    zabbix_server_version: 5.0
+    zabbix_server_listenport: 10051
+    zabbix_server_manage_service: false
+    zabbix_server_database: pgsql
+    zabbix_server_database_long: postgresql
+    zabbix_server_dbhost: 10.0.70.19
+    zabbix_server_db_port: 5432
+    zabbix_server_dbname: zabbix
+    zabbix_server_dbuser: zabbix
+    zabbix_server_dbpassword: supersecret
+    zabbix_server_database_creation: false
+    zabbix_server_database_sqlload: false
+
+- hosts: zabbix_server3
+  tags: [zabbix, zabbix-server]
+  become: yes
+  roles:
+    - zabbix_server
+    - keepalived
+  vars:
+    keepalived_interface: eth1
+    keepalived_virtual_router_id: 1
+    keepalived_virtual_ipaddress: 10.0.70.49
+    keepalived_priority: 102
+    keepalived_password: P@$$w0rd    
+    zabbix_server_version: 5.0
+    zabbix_server_listenport: 10051
+    zabbix_server_manage_service: false
+    zabbix_server_database: pgsql
+    zabbix_server_database_long: postgresql
+    zabbix_server_dbhost: 10.0.70.19
+    zabbix_server_db_port: 5432
+    zabbix_server_dbname: zabbix
+    zabbix_server_dbuser: zabbix
+    zabbix_server_dbpassword: supersecret
+    zabbix_server_database_creation: false
+    zabbix_server_database_sqlload: false
+
 - hosts: zabbix_web
   tags: [zabbix, zabbix-web]
   become: yes
@@ -213,16 +313,16 @@
     zabbix_nginx_vhost_port: 80
     zabbix_nginx_tls: false
     zabbix_php_version: 7.3
-    zabbix_server_name:
+    zabbix_server_name: 10.0.70.49
     zabbix_server_database: pgsql
     zabbix_server_database_long: postgresql
-    zabbix_server_hostname: 
+    zabbix_server_hostname: 10.0.70.49
     zabbix_server_listenport: 10051
-    zabbix_server_dbhost:
-    zabbix_server_dbname:
-    zabbix_server_dbuser:
-    zabbix_server_dbpassword:
-    zabbix_server_dbport:
+    zabbix_server_dbhost: 10.0.70.19
+    zabbix_server_dbname: zabbix
+    zabbix_server_dbuser: zabbix
+    zabbix_server_dbpassword: supersecret
+    zabbix_server_dbport: 5432
 
 - hosts: zabbix_agent
   tags: [zabbix, zabbix-agent]

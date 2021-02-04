@@ -1,14 +1,22 @@
 [all]
-patroni_postgresql2 ansible_host=Error # 0
-patroni_consul2 ansible_host=Error # 1
-entrypoint ansible_host=Error # 2
-patroni_haproxy1 ansible_host=Error # 3
-patroni_postgresql1 ansible_host=Error # 4
-patroni_haproxy2 ansible_host=Error # 5
-patroni_consul1 ansible_host=Error # 6
-patroni_postgresql3 ansible_host=Error # 7
-patroni_consul3 ansible_host=Error # 8
-centos-4gb-ams1-1 ansible_host=Error # 9
+patroni_postgresql3 ansible_host=Error # 0
+patroni_postgresql1 ansible_host=Error # 1
+patroni_postgresql2 ansible_host=Error # 2
+entrypoint ansible_host=Error # 3
+zabbix_web1 ansible_host=Error # 4
+zabbix_web3 ansible_host=Error # 5
+zabbix_web2 ansible_host=Error # 6
+patroni_consul2 ansible_host=Error # 7
+zabbix_server1 ansible_host=Error # 8
+patroni_consul1 ansible_host=Error # 9
+zabbix_server3 ansible_host=Error # 10
+patroni_consul3 ansible_host=Error # 11
+zabbix_server2 ansible_host=Error # 12
+patroni_haproxy1 ansible_host=Error # 13
+patroni_haproxy2 ansible_host=Error # 14
+zabbix_haproxy2 ansible_host=Error # 15
+zabbix_haproxy1 ansible_host=Error # 16
+centos-4gb-ams1-1 ansible_host=Error # 17
 
 [entrypoint]
-entrypoint ansible_host=185.177.93.144 # external IP address for web-application user
+entrypoint ansible_host=185.177.92.12 # external IP address for web-application user

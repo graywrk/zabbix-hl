@@ -1,0 +1,39 @@
+---
+- name: Install haproxy
+  yum: 
+    name: haproxy
+    state: present
+
+- name: Deploy haproxy config
+  template: 
+    src: haproxy.cfg.j2 
+    dest: /etc/haproxy/haproxy.cfg
+  notify: restart haproxy
+
+- name: Enable haproxy to be started at boot
+  service: 
+    name: haproxy
+    enabled: yes
+    state: started
+
+- name: Check if firewalld is running
+  command: systemctl status firewalld
+  ignore_errors: yes
+  changed_when: false
+  register: firewalld_status
+
+- name: Open ports for haproxy
+  firewalld:
+    zone: public
+    port: "{{ haproxy_bind_port }}/tcp"
+    permanent: true
+    state: enabled
+  when: firewalld_status is succeeded
+
+- name: Open ports for haproxy statistics
+  firewalld:
+    zone: public
+    port: "{{ haproxy_statistics_bind_port }}/tcp"
+    permanent: true
+    state: enabled
+  when: firewalld_status is succeeded
